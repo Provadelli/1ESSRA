@@ -65,6 +65,32 @@ campoCelular.addEventListener('input', function() {
     valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
     campoCelular.value = valor;
 });
+// 5. Monta o texto do comprovante e aciona o download (via utils.js)
+function gerarComprovante(dados) {
+    const conteudo = 
+`=== PRÉ-CADASTRO DE INGRESSO ROCK IN RIO ===
+Nome: ${dados.nome}
+CPF: ${dados.cpf}
+Email: ${dados.email}
+Celular: ${dados.celular || 'Não informado'}
+Artista: ${dados.artista}
+==========================================
+Agradecemos por registrar sua intenção de compra!
+Em breve, você receberá mais informações sobre a disponibilidade de ingressos.
+`;
+
+    // Nome dinâmico do arquivo com base no artista
+    const nomeSlug = dados.nome
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+        .trim()
+        .replace(/\s+/g, '_');
+    const nomeArquivo = `ingresso_${nomeSlug}.txt`;
+
+    // Chama a função genérica definida em js/utils.js
+    salvarDadosEmTXT(nomeArquivo, conteudo);
+}
+
 
 // 6. Processamento do Formulário ao Clicar no Botão
 btnCadastrar.addEventListener('click', function() {
@@ -105,6 +131,8 @@ btnCadastrar.addEventListener('click', function() {
         artista: campoArtista.value.trim()
     };
 
+     // Dispara a geração e o download automático do comprovante .txt
+    gerarComprovante(dadosReserva);
 
     // Mensagem de Sucesso na Tela
     divResultado.className = 'msg-sucesso';
